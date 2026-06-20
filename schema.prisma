@@ -1,0 +1,193 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  security
+  engineer
+  contractor
+  finance
+}
+
+enum Priority {
+  critical
+  high
+  medium
+  low
+}
+
+enum AlertCategory {
+  security
+  file
+  cost
+  anomaly
+}
+
+enum Verdict {
+  safe
+  suspicious
+  malicious
+}
+
+enum SurfaceStatus {
+  compliant
+  warning
+  critical
+}
+
+enum WorkflowStatus {
+  active
+  pending
+  completed
+}
+
+enum ChatRole {
+  user
+  assistant
+}
+
+enum ChatSource {
+  gemini
+  local
+}
+
+model User {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  password   String
+  role       Role     @default(engineer)
+  mfa        Boolean  @default(false)
+  lastLogin  BigInt?
+  logins24h  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model VirtualMachine {
+  id          String   @id @default(uuid())
+  name        String
+  cpuPercent  Int
+  isIdle      Boolean  @default(false)
+  kwhMonthly  Float    @default(0)
+  costMonthly Float    @default(0)
+  isOversized Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model StorageBucket {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  isPublic    Boolean  @default(false)
+  isEncrypted Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ScannedFile {
+  id            String      @id @default(uuid())
+  name          String
+  href          String?
+  url           String?
+  ext           String?
+  cloudProvider String?
+  riskScore     Int         @default(0)
+  verdict       Verdict     @default(safe)
+  scannedAt     BigInt?
+  probed        Boolean     @default(false)
+  actualType    String?
+  magicMismatch String?
+  contentType   String?
+  fileSize      BigInt?
+  createdAt     DateTime    @default(now())
+  threats       FileThreat[]
+}
+
+model FileThreat {
+  id      Int         @id @default(autoincrement())
+  fileId  String
+  code    String
+  level   Priority
+  message String
+  file    ScannedFile @relation(fields: [fileId], references: [id], onDelete: Cascade)
+}
+
+model Alert {
+  id          String        @id @default(uuid())
+  category    AlertCategory
+  description String
+  priority    Priority
+  acknowledged Boolean      @default(false)
+  createdAt   BigInt        @default(0)
+}
+
+model AnomalyEvent {
+  id         String   @id @default(uuid())
+  type       String
+  detail     String
+  severity   Priority @default(medium)
+  detectedAt BigInt?
+  createdAt  DateTime @default(now())
+}
+
+model ThreatSurface {
+  id          String        @id @default(uuid())
+  surfaceName String
+  status      SurfaceStatus
+  impact      String?
+  checkedAt   BigInt?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Recommendation {
+  id          String   @id
+  icon        String?
+  title       String
+  description String?
+  action      String
+  isApplied   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  timestamp String
+  eventType String
+  actor     String?
+  resource  String?
+  outcome   String?
+  createdAt DateTime @default(now())
+}
+
+model ChatMessage {
+  id        Int        @id @default(autoincrement())
+  role      ChatRole
+  message   String
+  source    ChatSource @default(local)
+  createdAt DateTime   @default(now())
+}
+
+model WorkflowPhase {
+  phase           Int            @id
+  title           String
+  description     String?
+  requiredRole    String?
+  status          WorkflowStatus @default(pending)
+  energyEstimate  Int?
+  costEstimate    Int?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+model RiskSnapshot {
+  id        Int      @id @default(autoincrement())
+  score     Int
+  createdAt DateTime @default(now())
+}
