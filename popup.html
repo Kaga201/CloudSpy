@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CloudSpy</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="brand">
+    <div class="logo">CS</div>
+    <div>
+      <h1>CloudSpy</h1>
+      <p><span class="live"></span>Extension active</p>
+    </div>
+  </div>
+
+  <div class="status" id="status-panel">
+    <div class="status-row">
+      <span class="label">Current tab</span>
+      <span class="val" id="tab-status">Scanning…</span>
+    </div>
+    <div class="status-row">
+      <span class="label">Findings</span>
+      <span class="val" id="finding-count">—</span>
+    </div>
+    <div class="status-row">
+      <span class="label">Page risk</span>
+      <span class="val" id="page-risk">—</span>
+    </div>
+    <div class="site" id="site-url">—</div>
+    <div class="findings" id="findings-list"></div>
+  </div>
+
+  <button class="btn btn-primary" id="btn-scan">🔍 Scan This Page</button>
+  <button class="btn btn-secondary" id="btn-dashboard">📊 Open Full Dashboard</button>
+
+  <p class="hint">Badge number = findings on current page. Green = clean, amber/red = issues found.</p>
+
+  <div class="test-sites">
+    <h3>Test sites</h3>
+    <a class="test-link" href="http://neverssl.com/" target="_blank">neverssl.com — HTTP (should flag CRITICAL)</a>
+    <a class="test-link" href="https://example.com/" target="_blank">example.com — clean HTTPS baseline</a>
+    <a class="test-link" href="https://github.com/" target="_blank">github.com — login form detection</a>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

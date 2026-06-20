@@ -1,0 +1,9 @@
+{
+  "name": "cloudspy",
+  "version": "1.0.0",
+  "description": "Construction cloud security & sustainability monitoring console",
+  "scripts": {
+    "start": "npx --yes serve . -p 3000",
+    "dev": "npx --yes serve . -p 3000"
+  }
+}
